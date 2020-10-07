@@ -15,3 +15,15 @@ IoT_API.py and sendMessageCode.py shoud used in AWS Lambda. They are constructed
 - sendMessageCode.py: It will triggered by Rule Engine. So create a Iot thing after you created lambda function. Then select the lambda function as a target funciton.
 - IoT_Device_Simulator.py: Run this code in Jupytor Notebook. Each part run in different section.
 - awsIoT.html: Run this code in a server. Remember to change the API link to your API Gateway's endpoint.
+
+## Display
+### Web page
+![](https://i.imgur.com/yY2cMKX.png)
+
+### IoT Device simulator
+As the image shown below device's status will change if user use controller to change it status.
+![](https://i.imgur.com/OychIl7.png)
+
+### Text message
+The message that send after the status of the device is changed.
+![](https://i.imgur.com/GV7pUMR.png)
