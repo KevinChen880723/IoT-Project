@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--In this document, we try to use user input -->
+<html>
+    <header>
+
+        <title>IoT Device Controller</title>
+        <style>
+            body
+            {
+                text-align: center;
+                background-color: rgba(194, 224, 235, 0.363);
+            }
+
+            #MyHeader
+            {
+                background-color: rgb(242, 250, 249);
+            }
+        </style>
+    </header>
+
+    <body onload="GET()">
+
+        <h1 style="color:rgb(0, 0, 0)" id="MyHeader">IoT Device Controller</h1><hr>
+
+        <form action=""></form>
+
+        <form id="form" name="form" >
+            
+            <label for="color" style="color:rgb(88, 177, 37)">Choose <strong>Color</strong>:</label>
+            <select name="color" id="color" onclick="clearResult()">
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
+            </select>
+
+            <br><br>
+            
+            <label for="power" style="color:rgb(73, 126, 207)"  face="標楷體">Choose <strong>Power State</strong>:</label>
+            <input type="radio" name="power" id="power" value="on" checked=true onclick="clearResult()">on
+            <input type="radio" name="power" id="power" value="off" onclick="clearResult()">off
+
+            <br><br>
+
+            <input type="button" value = "Confirm" onclick="PUT()">
+            <input type="reset" value = "Reset" onclick="clearResult()">
+        </form>
+
+        <br><br>
+
+        <img src="img/IoT.png" alt="IoT圖片" height="200" width="400">
+
+        <br>
+
+        <label for="APIResult">Result:</label>
+        <input type="text" readonly="readonly" value="" id="APIResult">
+    </body>
+</html>
+
+<script>
+    async function PUT()
+    {
+        let formName = document.getElementById("form");
+        for(var x=0 ; x<formName.power.length;x++)
+        {
+            console.log(formName.power[x])
+            if(formName.power[x].checked)
+            {
+                var power = formName.power[x].value;
+            }
+        }
+        let color = document.getElementById("color").value;
+
+        let url = " https://rsw06w0r18.execute-api.us-east-1.amazonaws.com/IoTControllerAPIStage/iot/shadows/KEVIN_IoT_Thing"
+        let data = {
+            "color": color,
+            "power": power
+        }
+
+        const response = await fetch(url,  {
+            method: 'PUT', 
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }});
+        const result = await response.json();
+        console.log(result);
+        document.getElementById("APIResult").value = result;
+    }
+
+    async function GET()
+    {
+        let url = " https://rsw06w0r18.execute-api.us-east-1.amazonaws.com/IoTControllerAPIStage/iot/shadows/KEVIN_IoT_Thing"
+
+        const response = await fetch(url,  {
+            method: 'GET', 
+            headers: {
+                'Content-Type': 'application/json'
+            }});
+        const result = await response.json();
+        if(result !== "Shadow doesn't exist")
+        {
+            //Set the color to match device's color
+            let sel = document.getElementById('color');
+            let opt = sel.getElementsByTagName("option");
+            let getColor = result.state.reported.color;
+            if(getColor === "red")
+            {
+                opt[0].selected = true;
+            }
+            else if(getColor === "green") 
+            {
+                opt[1].selected = true;
+            }
+            else
+            {
+                opt[2].selected = true;
+            }
+            //Set the power to match device's power
+            formName = document.getElementById('form');
+            if(result.state.reported.power === "off")
+            {
+                formName.power[0].checked = false;
+                formName.power[1].checked = true;
+            }
+            else
+            {
+                formName.power[0].checked = true;
+                formName.power[1].checked = false;
+            }
+            document.getElementById("APIResult").value = "Get Shadow Success!";
+        }
+        else
+        {
+            document.getElementById("color").value = "red";
+            document.getElementById("APIResult").value = result;
+        }
+        
+    }
+
+    function clearResult()
+    {
+        document.getElementById("APIResult").value = "";
+    }
+</script>
